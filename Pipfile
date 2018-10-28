@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pylint = "*"
+h5py = "*"
+hyperdash = "*"
+tensorflow = {version = "*", sys_platform = "== 'darwin'"}
+tensorflow-gpu = {version = "*", sys_platform = "!= 'darwin'"}
+numpy = "*"
+seaborn = "*"
+matplotlib = "*"
+pandas = "*"
+pillow = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
