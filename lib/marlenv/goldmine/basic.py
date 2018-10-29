@@ -1,6 +1,5 @@
 import numpy as np
 from marlenv.env import Env
-# from marlenv.util import Debugger
 
 class Goldmine(Env):
     """
@@ -71,8 +70,6 @@ class Goldmine(Env):
                 self.agent_state[self.agent_pos[i][0], self.agent_pos[i][1]] = 0
                 self.agent_pos[i] = npos
                 self.agent_state[npos[0], npos[1]] = 1
-            else:
-                import pdb; pdb.set_trace()
 
             y, x = self.agent_pos[i]
             if self.task_state[y, x]:

@@ -1,20 +1,14 @@
 import os
-import importlib
-import argparse
 import numpy as np
 from datetime import datetime as dt
 
 from agent.deepq.non_communicated_dqn import NonCommunicatedDQN
-from agent.util import Memory, EpsilonExponentialDecay, EpsilonLinearDecay
+from agent.util import Memory, EpsilonLinearDecay
 
 from marlenv.goldmine.basic import Goldmine
 from marlenv.util import GoldmineRecorder
 
 from util import Logger
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--config')
-args = parser.parse_args()
 
 # parameters
 EPOCHS = 40000
@@ -35,9 +29,6 @@ AGENT_NUM = 3
 # paths
 tstr = dt.now().strftime('%Y%m%d_%H%M%S')
 base_path = 'outputs/ncdqn_{}'.format(tstr)
-
-if args.config and args.config != '':
-    importlib.import_module(args.config)
 
 if not os.path.exists(base_path):
     os.makedirs(base_path)

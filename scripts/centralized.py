@@ -1,6 +1,4 @@
 import os
-import importlib
-import argparse
 import numpy as np
 from datetime import datetime as dt
 
@@ -11,10 +9,6 @@ from marlenv.goldmine.basic import Goldmine
 from marlenv.util import GoldmineRecorder
 
 from util import Logger
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-c', '--config')
-args = parser.parse_args()
 
 # parameters
 EPOCHS = 40000
@@ -34,9 +28,6 @@ AGENT_NUM = 3
 # paths
 tstr = dt.now().strftime('%Y%m%d_%H%M%S')
 base_path = 'outputs/centralized_{}'.format(tstr)
-
-if args.config and args.config != '':
-    importlib.import_module(args.config)
 
 if not os.path.exists(base_path):
     os.makedirs(base_path)

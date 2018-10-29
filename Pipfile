@@ -13,7 +13,6 @@ numpy = "*"
 seaborn = "*"
 matplotlib = "*"
 pandas = "*"
-pillow = "*"
 
 [dev-packages]
 

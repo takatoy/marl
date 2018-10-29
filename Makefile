@@ -9,10 +9,10 @@ hd-login:
 	pipenv run hd login --email
 
 hd-train:
-	PYTHONPATH=./lib CUDA_VISIBLE_DEVICES=$(GPU_NUM) pipenv run hd run -n='$(HD_NAME)' python $(SCRIPT_PATH) -c='$(CONFIG_MOD)'
+	PYTHONPATH=./lib CUDA_VISIBLE_DEVICES=$(g) pipenv run hd run -n='$(n)' python $(s)
 
 train:
-	PYTHONPATH=./lib pipenv run python $(SCRIPT_PATH) -c='$(CONFIG_MOD)'
+	PYTHONPATH=./lib pipenv run python $(s)
 
 clean:
 	rm -rf outputs
