@@ -8,8 +8,6 @@ class Goldmine(Env):
 
     Actions: 0: Move Up, 1: Move Right, 2: Move Down, 3: Move Left
     """
-    MOVE_MAP = [[-1, 0], [0, 1], [1, 0], [0, -1]]
-
     def __init__(self, agent_num):
         # parameters
         self.height = 20
@@ -27,11 +25,15 @@ class Goldmine(Env):
         self.action = np.array([-1] * self.agent_num, dtype=np.int16)
         self.reward = np.zeros((self.agent_num,), dtype=np.float32)
         self.task_update = []
+        self.move_map = [[-1, 0], [0, 1], [1, 0], [0, -1]]
 
         self.reset()
 
     def reset(self):
         self.step_cnt = 0
+        self.action = np.array([-1] * self.agent_num, dtype=np.int16)
+        self.reward = np.zeros((self.agent_num,), dtype=np.float32)
+
         self.agent_pos = np.zeros((self.agent_num, 2), dtype=np.int16)
         self.agent_state = np.zeros((self.height, self.width), dtype=np.bool)
         self.task_state = np.zeros((self.height, self.width), dtype=np.bool)
@@ -58,20 +60,19 @@ class Goldmine(Env):
         self.reward = np.zeros((self.agent_num,), dtype=np.float32)
         done = False # done is always False in this environment
 
-        # Move agents
-        move_map = np.array([self.MOVE_MAP[a] for a in action])
-        new_agent_pos = self.agent_pos + move_map
-
         task_finished = []
         action_order = np.arange(self.agent_num)
         np.random.shuffle(action_order)
         for i in action_order:
-            pos = new_agent_pos[i]
-            if not pos[0] < 0 and not pos[0] >= self.height and \
-               not pos[1] < 0 and not pos[1] >= self.width  and \
-               not self.agent_state[pos[0], pos[1]]:
-                self.agent_pos[i] = pos
-                self.agent_state[pos] = 1
+            npos = self.agent_pos[i] + self.move_map[action[i]]
+            if not npos[0] < 0 and not npos[0] >= self.height and \
+               not npos[1] < 0 and not npos[1] >= self.width  and \
+               not self.agent_state[npos[0], npos[1]]:
+                self.agent_state[self.agent_pos[i][0], self.agent_pos[i][1]] = 0
+                self.agent_pos[i] = npos
+                self.agent_state[npos[0], npos[1]] = 1
+            else:
+                import pdb; pdb.set_trace()
 
             y, x = self.agent_pos[i]
             if self.task_state[y, x]:
@@ -82,9 +83,6 @@ class Goldmine(Env):
         for i, y, x in task_finished:
             ny, nx = self._spawn_task()
             self.task_update.append([self.step_cnt, i, y, x, ny, nx])
-
-        self.agent_state = np.zeros_like(self.agent_state)
-        self.agent_state[self.agent_pos[:, 0], self.agent_pos[:, 1]] = 1
 
         self.step_cnt += 1
 
