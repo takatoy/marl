@@ -10,7 +10,7 @@ from agent.util import Memory
 
 class NonCommunicatedDQN(Agent):
     def __init__(self, action_space, observation_space, memory_size,
-                 batch_size, learning_rate, gamma, target_update, use_dual):
+                 batch_size, learning_rate, gamma, target_update, use_dueling):
         # parameters
         self.observation_space = observation_space
         self.action_space      = action_space
@@ -19,16 +19,16 @@ class NonCommunicatedDQN(Agent):
         self.learning_rate     = learning_rate
         self.gamma             = gamma
         self.target_update     = target_update
-        self.use_dual          = use_dual
+        self.use_dueling       = use_dueling
 
         # variables
         self.train_cnt = 0
         self.memory = Memory(memory_size)
 
-        self.target_network = self._get_model()
-        self.eval_network   = self._get_model()
+        self.target_network = self.__get_model()
+        self.eval_network   = self.__get_model()
 
-    def _get_model(self):
+    def __get_model(self):
         obs_in = Input(shape=self.observation_space, dtype='float32')
 
         # DQN paper network
@@ -46,7 +46,7 @@ class NonCommunicatedDQN(Agent):
         # x = Flatten()(x)
         # x = Dense(100, activation='relu')(x)
 
-        if self.use_dual:
+        if self.use_dueling:
             value = Dense(1)(x)
             advantage = Dense(self.action_space, use_bias=False)(x)
             q_vals = Lambda(lambda a: a[0] + (a[1] - K.mean(a[1], keepdims=True)),
@@ -71,16 +71,16 @@ class NonCommunicatedDQN(Agent):
 
     def train(self):
         batch_obs, batch_action, batch_reward, batch_nobs = self.memory.sample(self.batch_size)
-        batch_target = self._calc_target(batch_obs, batch_action, batch_reward, batch_nobs)
+        batch_target = self.__calc_target(batch_obs, batch_action, batch_reward, batch_nobs)
         loss = self.eval_network.train_on_batch(batch_obs, batch_target)
 
         self.train_cnt += 1
         if self.train_cnt % self.target_update == 0:
-            self._update_target()
+            self.__update_target()
 
         return loss
 
-    def _calc_target(self, batch_obs, batch_action, batch_reward, batch_nobs):
+    def __calc_target(self, batch_obs, batch_action, batch_reward, batch_nobs):
         n = len(batch_action)
 
         target_q_vals = self.target_network.predict(batch_nobs, batch_size=self.batch_size)
@@ -93,7 +93,7 @@ class NonCommunicatedDQN(Agent):
 
         return targets
 
-    def _update_target(self):
+    def __update_target(self):
         self.target_network.set_weights(self.eval_network.get_weights())
 
     def save(self, path, epoch):

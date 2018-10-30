@@ -15,13 +15,13 @@ EPOCHS = 40000
 STEPS = 200
 NO_OP_EPOCHS = 100
 MEMORY_SIZE = 40000
-BATCH_SIZE = 32
+BATCH_SIZE = 256
 LEARNING_RATE = 0.00025
 GAMMA = 0.99
 TARGET_UPDATE = STEPS
-USE_DUAL = False
+USE_DUELING = False
 EPSILON = EpsilonLinearDecay(init=1.0, end=0.1, epochs=20000)
-TRAIN_EVERY = 1
+TRAIN_EVERY = 8
 SAVE_MODEL_EVERY = 1000
 
 AGENT_NUM = 3
@@ -54,7 +54,7 @@ agents = [
         learning_rate     = LEARNING_RATE,
         gamma             = GAMMA,
         target_update     = TARGET_UPDATE,
-        use_dual          = USE_DUAL
+        use_dueling       = USE_DUELING
     ) for _ in range(agent_num)
 ]
 

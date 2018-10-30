@@ -9,11 +9,12 @@ from agent.agent import Agent
 from agent.util import Memory
 
 class CentralizedDQN(Agent):
-    def __init__(self, action_space, observation_space, agent_num, memory_size,
+    def __init__(self, action_space, observation_space, task_space, agent_num, memory_size,
                  batch_size, learning_rate, gamma, target_update):
         # parameters
-        self.observation_space = observation_space
         self.action_space      = action_space
+        self.observation_space = observation_space
+        self.task_space        = task_space
         self.agent_num         = agent_num
         self.memory_size       = memory_size
         self.batch_size        = batch_size
@@ -25,23 +26,28 @@ class CentralizedDQN(Agent):
         self.train_cnt = 0
         self.memory = Memory(memory_size)
 
-        self.target_network = self._get_model()
-        self.eval_network   = self._get_model()
+        self.target_network = self.__get_model()
+        self.eval_network   = self.__get_model()
 
-    def _get_model(self):
-        input_shape = (self.observation_space[0] * self.agent_num,) + self.observation_space[1:]
-        obs_in = Input(shape=input_shape, dtype='float32')
+    def __get_model(self):
+        task_in = Input(shape=self.task_space, dtype='float32')
+        task_out = Conv2D(16, 4, 2, padding='same', activation='relu')(task_in)
+        task_out = Conv2D(32, 2, 1, padding='same', activation='relu')(task_out)
+        task_out = Conv2D(32, 2, 1, padding='same', activation='relu')(task_out)
+        task_out = Flatten()(task_out)
 
-        # DQN paper network
-        x = Conv2D(32, 8, 4, padding='same', activation='relu')(obs_in)
-        x = Conv2D(64, 4, 2, padding='same', activation='relu')(x)
-        x = Conv2D(64, 3, 1, padding='same', activation='relu')(x)
-        x = Flatten()(x)
+        obs_in = Input(shape=self.observation_space, dtype='float32')
+        obs_out = Conv2D(32, 8, 4, padding='same', activation='relu')(obs_in)
+        obs_out = Conv2D(64, 4, 2, padding='same', activation='relu')(obs_out)
+        obs_out = Conv2D(64, 3, 1, padding='same', activation='relu')(obs_out)
+        obs_out = Flatten()(obs_out)
+
+        x = concatenate([task_out, obs_out])
         x = Dense(512, activation='relu')(x)
 
         q_vals = Dense(self.action_space * self.agent_num)(x)
 
-        model = Model(inputs=obs_in, outputs=q_vals)
+        model = Model(inputs=[task_in, obs_in], outputs=q_vals)
         optimizer = RMSprop(lr=self.learning_rate)
         model.compile(loss='mean_squared_error', optimizer=optimizer)
 
@@ -49,7 +55,8 @@ class CentralizedDQN(Agent):
 
     def get_action(self, obs, eps):
         if eps < np.random.uniform(0, 1):
-            q_vals = self.eval_network.predict(np.expand_dims(obs, axis=0), batch_size=1)
+            obs = [np.expand_dims(obs[0], axis=0), np.expand_dims(obs[1], axis=0)]
+            q_vals = self.eval_network.predict(obs, batch_size=1)
             q_vals = np.reshape(q_vals, (self.agent_num, self.action_space))
             actions = np.argmax(q_vals, axis=1)
         else:
@@ -59,30 +66,35 @@ class CentralizedDQN(Agent):
 
     def train(self):
         batch_obs, batch_action, batch_reward, batch_nobs = self.memory.sample(self.batch_size)
-        batch_target = self._calc_target(batch_obs, batch_action, batch_reward, batch_nobs)
+        batch_obs  = np.array(batch_obs).transpose(1, 0).tolist()
+        batch_nobs = np.array(batch_nobs).transpose(1, 0).tolist()
+        batch_target = self.__calc_target(batch_obs, batch_action, batch_reward, batch_nobs)
         loss = self.eval_network.train_on_batch(batch_obs, batch_target)
 
         self.train_cnt += 1
         if self.train_cnt % self.target_update == 0:
-            self._update_target()
+            self.__update_target()
 
         return loss
 
-    def _calc_target(self, batch_obs, batch_action, batch_reward, batch_nobs):
+    def __calc_target(self, batch_obs, batch_action, batch_reward, batch_nobs):
         target_q_vals = self.target_network.predict(batch_nobs, batch_size=self.batch_size)
         eval_q_vals = self.eval_network.predict(batch_nobs, batch_size=self.batch_size)
 
         targets = self.target_network.predict(batch_obs, batch_size=self.batch_size)
+        targets = np.resize(targets, (self.batch_size, self.agent_num, self.action_space))
         for i, (t, e) in enumerate(zip(target_q_vals, eval_q_vals)):
-            e = np.resize(e, (self.agent_num, self.action_space))
             t = np.resize(t, (self.agent_num, self.action_space))
+            e = np.resize(e, (self.agent_num, self.action_space))
+
             next_vals = t[np.arange(self.agent_num), np.argmax(e, axis=1)]
             next_vals = batch_reward[i] + self.gamma * next_vals
-            targets[i, [j * self.action_space + batch_action[i][j] for j in range(self.agent_num)]] = next_vals
+            targets[i, np.arange(self.agent_num), batch_action[i]] = next_vals
+        targets = np.resize(targets, (self.batch_size, self.action_space * self.agent_num))
 
         return targets
 
-    def _update_target(self):
+    def __update_target(self):
         self.target_network.set_weights(self.eval_network.get_weights())
 
     def save(self, path, epoch):
