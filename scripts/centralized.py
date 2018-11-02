@@ -19,7 +19,7 @@ BATCH_SIZE = 256
 LEARNING_RATE = 0.00025
 GAMMA = 0.99
 TARGET_UPDATE = STEPS
-EPSILON = EpsilonLinearDecay(init=1.0, end=0.1, epochs=20000)
+EPSILON = EpsilonLinearDecay(init=1.0, end=0.1, epochs=5000)
 TRAIN_EVERY = 8
 SAVE_MODEL_EVERY = 1000
 
