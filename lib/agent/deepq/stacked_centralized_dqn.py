@@ -77,6 +77,7 @@ class StackedCentralizedDQN(Agent):
             next_vals = t[np.arange(self.agent_num), np.argmax(e, axis=1)]
             next_vals = batch_reward[i] + self.gamma * next_vals
             targets[i, np.arange(self.agent_num), batch_action[i]] = next_vals
+            import pdb; pdb.set_trace()
         targets = np.resize(targets, (self.batch_size, self.action_space * self.agent_num))
 
         return targets

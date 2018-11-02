@@ -28,7 +28,7 @@ AGENT_NUM = 3
 
 # paths
 tstr = dt.now().strftime('%Y%m%d_%H%M%S')
-base_path = 'outputs/non_communicated_{}'.format(tstr)
+base_path = 'outputs/communicated_{}'.format(tstr)
 
 if not os.path.exists(base_path):
     os.makedirs(base_path)
@@ -43,7 +43,7 @@ eval_logger   = Logger(base_path + '/eval.log')
 env = Goldmine(AGENT_NUM)
 agent_num = env.agent_num
 action_space = env.action_space
-observation_space = env.observation_space
+observation_space = env.observation_space[0:2] + (1 + agent_num,)
 
 agents = [
     SimpleDQN(
@@ -58,6 +58,12 @@ agents = [
     ) for _ in range(agent_num)
 ]
 
+def preprocess(obs):
+    return np.concatenate([
+        np.take(obs[0], [0], axis=2),  # task pos
+        np.concatenate(np.take(obs, [1], axis=3), axis=2)],  # agent pos
+        axis=2)
+
 # Run agents with random actions to gather experience
 print('Gathering random experiences...', end = '', flush=True)
 for e in range(NO_OP_EPOCHS):
@@ -66,7 +72,7 @@ for e in range(NO_OP_EPOCHS):
         action = np.random.choice(np.arange(action_space, dtype=np.int16), agent_num)
         nobs, reward, done, _ = env.step(action)
         for i, agent in enumerate(agents):
-            agent.memory.add(obs[i], action[i], reward[i], nobs[i])
+            agent.memory.add(preprocess(obs), action[i], reward[i], preprocess(nobs))
         obs = nobs
 print(' done!', flush=True)
 
@@ -88,12 +94,12 @@ for e in range(EPOCHS):
     total_loss = 0.0
     train_cnt = 0
     for s in range(STEPS):
-        action = [agent.get_action(obs[i], eps) for i, agent in enumerate(agents)]
+        action = [agent.get_action(preprocess(obs), eps) for i, agent in enumerate(agents)]
         nobs, reward, done, _ = env.step(np.array(action, dtype=np.int16))
         total_reward += reward.sum()
 
         for i, agent in enumerate(agents):
-            agent.memory.add(obs[i], action[i], reward[i], nobs[i])
+            agent.memory.add(preprocess(obs), action[i], reward[i], preprocess(nobs))
             if (s + 1) % TRAIN_EVERY == 0:
                 total_loss += agent.train()
                 train_cnt += 1
@@ -116,7 +122,7 @@ for e in range(EPOCHS):
 
     total_reward = 0
     for s in range(STEPS):
-        action = [agent.get_action(obs[i], 0.05) for i, agent in enumerate(agents)]  # Greedy
+        action = [agent.get_action(preprocess(obs), 0.05) for i, agent in enumerate(agents)]  # Greedy
         _, reward, _, _ = env.step(np.array(action, dtype=np.int16))
         total_reward += reward.sum()
         recorder.record(env.render())

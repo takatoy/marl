@@ -8,7 +8,7 @@ from tensorflow.keras import backend as K
 from agent.agent import Agent
 from agent.util import Memory
 
-class NonCommunicatedDQN(Agent):
+class SimpleDQN(Agent):
     def __init__(self, action_space, observation_space, memory_size,
                  batch_size, learning_rate, gamma, target_update, use_dueling):
         # parameters
