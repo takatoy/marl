@@ -58,8 +58,8 @@ agent = \
 
 def preprocess(obs):
     return np.concatenate([
-        np.take(obs[0], [0], axis=2),  # task pos
-        np.concatenate(np.take(obs, [1], axis=3), axis=2)],  # agent pos
+        np.take(obs[0], [1], axis=2),  # task pos
+        np.concatenate(np.take(obs, [0], axis=3), axis=2)],  # agent pos
         axis=2)
 
 # Run agents with random actions to gather experience
