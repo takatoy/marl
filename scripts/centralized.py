@@ -3,6 +3,7 @@ import numpy as np
 from datetime import datetime as dt
 
 from agent.deepq.centralized_dqn import CentralizedDQN
+from agent.deepq.joint_centralized_dqn import JointCentralizedDQN
 from agent.util import Memory, EpsilonLinearDecay
 
 from marlenv.goldmine.basic import Goldmine
@@ -27,7 +28,7 @@ AGENT_NUM = 3
 
 # paths
 tstr = dt.now().strftime('%Y%m%d_%H%M%S')
-base_path = 'outputs/centralized_{}'.format(tstr)
+base_path = 'outputs/stacked_centralized_{}'.format(tstr)
 
 if not os.path.exists(base_path):
     os.makedirs(base_path)
@@ -42,14 +43,12 @@ eval_logger   = Logger(base_path + '/eval.log')
 env = Goldmine(AGENT_NUM)
 agent_num = env.agent_num
 action_space = env.action_space
-observation_space = (env.observation_space[0] * agent_num, env.observation_space[1], 1)
-task_space = (env.observation_space[0], env.observation_space[1], 1)
+observation_space = env.observation_space[0:2] + (1 + agent_num,)
 
 agent = \
-    CentralizedDQN(
+    JointCentralizedDQN(
         action_space      = action_space,
         observation_space = observation_space,
-        task_space        = task_space,
         agent_num         = agent_num,
         memory_size       = MEMORY_SIZE,
         batch_size        = BATCH_SIZE,
@@ -59,9 +58,10 @@ agent = \
     )
 
 def preprocess(obs):
-    task_pos = obs[0, :, :, 1]
-    agent_pos = obs[:, :, :, 0]
-    return [np.expand_dims(task_pos, axis=3), np.expand_dims(np.concatenate(agent_pos, axis=0), axis=3)]
+    return np.concatenate([
+        np.take(obs[0], [1], axis=2),  # task pos
+        np.concatenate(np.take(obs, [0], axis=3), axis=2)],  # agent pos
+        axis=2)
 
 # Run agents with random actions to gather experience
 print('Gathering random experiences...', end = '', flush=True)
