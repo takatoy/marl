@@ -50,7 +50,7 @@ class JointCentralizedDQN(Agent):
             actions = []
             for i in range(self.agent_num):
                 actions.append(max_q % self.action_space)
-                max_q /= self.action_space
+                max_q //= self.action_space
         else:
             actions = np.random.randint(self.action_space, size=self.agent_num)
 
