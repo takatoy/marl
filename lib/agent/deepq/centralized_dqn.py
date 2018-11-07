@@ -35,7 +35,7 @@ class CentralizedDQN(Agent):
         x = Conv2D(64, 3, 1, padding='same', activation='relu')(x)
         x = Flatten()(x)
         x = Dense(512, activation='relu')(x)
-        q_vals = Dense(self.action_space * self.agent_num)(x)
+        q_vals = Dense(self.action_space ** self.agent_num)(x)
 
         model = Model(inputs=obs_in, outputs=q_vals)
         optimizer = RMSprop(lr=self.learning_rate)
@@ -46,8 +46,11 @@ class CentralizedDQN(Agent):
     def get_action(self, obs, eps):
         if eps < np.random.uniform(0, 1):
             q_vals = self.eval_network.predict(np.expand_dims(obs, axis=0), batch_size=1)
-            q_vals = np.reshape(q_vals, (self.agent_num, self.action_space))
-            actions = np.argmax(q_vals, axis=1)
+            max_q = np.argmax(q_vals)
+            actions = []
+            for i in range(self.agent_num):
+                actions.append(max_q % self.action_space)
+                max_q //= self.action_space
         else:
             actions = np.random.randint(self.action_space, size=self.agent_num)
 
@@ -69,15 +72,14 @@ class CentralizedDQN(Agent):
         eval_q_vals = self.eval_network.predict(batch_nobs, batch_size=self.batch_size)
 
         targets = self.target_network.predict(batch_obs, batch_size=self.batch_size)
-        targets = np.reshape(targets, (self.batch_size, self.agent_num, self.action_space))
-        for i, (t, e) in enumerate(zip(target_q_vals, eval_q_vals)):
-            t = np.reshape(t, (self.agent_num, self.action_space))
-            e = np.reshape(e, (self.agent_num, self.action_space))
 
-            next_vals = t[np.arange(self.agent_num), np.argmax(e, axis=1)]
-            next_vals = batch_reward[i] + self.gamma * next_vals
-            targets[i, np.arange(self.agent_num), batch_action[i]] = next_vals
-        targets = np.reshape(targets, (self.batch_size, self.action_space * self.agent_num))
+        next_val = target_q_vals[np.arange(self.batch_size), np.argmax(eval_q_vals, axis=1)]
+        next_val = batch_reward.sum(axis=1) + self.gamma * next_val
+
+        mul = np.array([x ** self.action_space for x in range(self.agent_num)])
+        joint_action = (batch_action * mul).sum(axis=1)
+
+        targets[np.arange(self.batch_size), joint_action] = next_val
 
         return targets
 
