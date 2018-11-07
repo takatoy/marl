@@ -31,6 +31,7 @@ params = {
         CentralizedDQN(
             action_space      = env.action_space,
             observation_space = env.observation_space,
+            agent_num         = agent_num,
             memory_size       = 40000,
             batch_size        = 256,
             learning_rate     = 0.00025,
