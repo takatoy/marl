@@ -127,9 +127,9 @@ class Trainer:
             # Save model
             if (e + 1) % self.save_model_every == 0:
                 if self.is_centralized:
-                    self.agent.save(model_path, e)
+                    self.agent.save(self.model_path, e)
                 else:
                     for i, ag in enumerate(self.agent):
-                        ag.save(model_path + '_{}'.format(i), e)
+                        ag.save(self.model_path + '_{}'.format(i), e)
 
             print()
