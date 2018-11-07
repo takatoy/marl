@@ -13,7 +13,7 @@ def preprocess(obs):
         axis=2)
 
 params = {
-    'name'              : 'non_communicated_dqn',
+    'name'              : 'centralized',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,

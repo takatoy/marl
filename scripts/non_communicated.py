@@ -7,7 +7,7 @@ agent_num = 3
 env = Goldmine(agent_num)
 
 params = {
-    'name'              : 'non_communicated_dqn',
+    'name'              : 'non_communicated',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
