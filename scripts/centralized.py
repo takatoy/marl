@@ -1,3 +1,4 @@
+import numpy as np
 from trainer import Trainer
 from agent.util import EpsilonLinearDecay
 from marlenv.goldmine.basic import Goldmine
@@ -5,6 +6,7 @@ from agent.deepq.centralized_dqn import CentralizedDQN
 
 agent_num = 3
 env = Goldmine(agent_num)
+observation_space = env.observation_space[0:2] + (4,)
 
 def preprocess(obs):
     return np.concatenate([
@@ -30,7 +32,7 @@ params = {
     'agent':
         CentralizedDQN(
             action_space      = env.action_space,
-            observation_space = env.observation_space,
+            observation_space = observation_space,
             agent_num         = agent_num,
             memory_size       = 40000,
             batch_size        = 256,

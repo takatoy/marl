@@ -101,10 +101,10 @@ class Trainer:
                 total_reward += reward.sum()
 
                 if self.preprocess is not None:
-                    nobs = preprocess(nobs)
+                    nobs = self.preprocess(nobs)
 
                 if self.is_centralized:
-                    self.agent.memory.add(preprocess(obs), action, reward, preprocess(nobs))
+                    self.agent.memory.add(obs, action, reward, nobs)
                     if (s + 1) % self.train_every == 0:
                         total_loss += self.agent.train()
                         train_cnt += 1
