@@ -113,15 +113,15 @@ class Goldmine(Env):
         np.random.seed(seed=seed)
 
     def _get_observation(self):
-        observation = np.zeros((self.agent_num,) + self.observation_space, dtype=np.float32)
-        observation[np.arange(self.agent_num), :, :, 1] = self.task_state.astype(np.float32)
-        observation[np.arange(self.agent_num), :, :, 2] = self.agent_state.astype(np.float32)
+        obs = np.zeros((self.agent_num,) + self.observation_space, dtype=np.float32)
+        obs[np.arange(self.agent_num), :, :, 1] = self.task_state.astype(np.float32)
+        obs[np.arange(self.agent_num), :, :, 2] = self.agent_state.astype(np.float32)
 
         ys, xs = self.agent_pos[:, 0], self.agent_pos[:, 1]
-        observation[np.arange(self.agent_num), ys, xs, 0] = 1.0
-        observation[np.arange(self.agent_num), ys, xs, 2] = 0.0
+        obs[np.arange(self.agent_num), ys, xs, 0] = 1.0
+        obs[np.arange(self.agent_num), ys, xs, 2] = 0.0
 
-        return observation
+        return obs
 
     def _spawn_task(self):
         while True:

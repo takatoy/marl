@@ -1,13 +1,14 @@
 from trainer import Trainer
 from agent.util import EpsilonLinearDecay
-from marlenv.goldmine.basic import Goldmine
+from marlenv.goldmine.relative import GoldmineRV
 from agent.deepq.simple_dqn import SimpleDQN
 
-agent_num = 3
-env = Goldmine(agent_num)
+agent_num = 1
+view_range = 1
+env = GoldmineRV(agent_num, view_range)
 
 params = {
-    'name'              : 'non_communicated',
+    'name'              : 'rv_non_communicated',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,

@@ -23,9 +23,6 @@ class Trainer:
         self.record_path = base_path + '/record'
         if not os.path.exists(self.record_path):
             os.makedirs(self.record_path)
-        self.eval_path = base_path + '/eval'
-        if not os.path.exists(self.eval_path):
-            os.makedirs(self.eval_path)
         self.model_path = base_path + '/model'
         if not os.path.exists(self.model_path):
             os.makedirs(self.model_path)
@@ -130,6 +127,6 @@ class Trainer:
                     self.agent.save(self.model_path, e)
                 else:
                     for i, ag in enumerate(self.agent):
-                        ag.save(self.model_path + '_{}'.format(i), e)
+                        ag.save(self.model_path, e, i)
 
             print()

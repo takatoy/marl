@@ -19,7 +19,7 @@ params = {
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
-    'epsilon'           : EpsilonLinearDecay(init=1.0, end=0.1, epochs=5000),
+    'epsilon'           : EpsilonLinearDecay(init=1.0, end=0.05, epochs=5000),
     'train_every'       : 8,
     'save_model_every'  : 1000,
     'is_centralized'    : True,
