@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import tensorflow as tf
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
 from tensorflow.keras.optimizers import RMSprop
@@ -7,6 +8,11 @@ from tensorflow.keras import backend as K
 
 from agent.agent import Agent
 from agent.util import Memory
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+sess = tf.Session(config=config)
+K.set_session(sess)
 
 class SimpleDQN(Agent):
     def __init__(self, action_space, observation_space, memory_size,
