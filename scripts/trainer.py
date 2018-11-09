@@ -1,4 +1,5 @@
-import os
+import os, sys
+import shutil
 import numpy as np
 from datetime import datetime as dt
 from marlenv.util import GoldmineRecorder
@@ -6,27 +7,35 @@ from marlenv.util import GoldmineRecorder
 class Logger:
     def __init__(self, path):
         self.log_fp = open(path, 'w')
+        self.log_fp.write('episode, reward, loss\n')
 
-    def log(self, epoch, reward, loss):
-        self.log_fp.write('epoch {:d}: reward {:.6f}, loss {:.6f}\n'.format(epoch, reward, loss))
+    def log(self, episode, reward, loss):
+        self.log_fp.write('{:d},{:.6f},{:.6f}\n'.format(episode, reward, loss))
 
 class Trainer:
     def __init__(self, env, agent, name, episodes, steps, no_op_episodes,
                  epsilon, train_every, save_model_every, agent_num, action_space,
                  preprocess=None, is_centralized=False):
 
-        # Prepare saving paths
+        # Base saving path
         tstr = dt.now().strftime('%Y%m%d_%H%M%S')
-        base_path = 'outputs/' + name + '_{}'.format(tstr)
-        if not os.path.exists(base_path):
-            os.makedirs(base_path)
-        self.record_path = base_path + '/record'
+        self.base_path = 'outputs/' + name + '_{}'.format(tstr)
+        if not os.path.exists(self.base_path):
+            os.makedirs(self.base_path)
+
+        # Copy script to record the parameters
+        script_path = sys.argv[0]
+        shutil.copy(script_path, self.base_path + '/script.py')
+
+        self.record_path = self.base_path + '/record'
         if not os.path.exists(self.record_path):
             os.makedirs(self.record_path)
-        self.model_path = base_path + '/model'
+
+        self.model_path = self.base_path + '/model'
         if not os.path.exists(self.model_path):
             os.makedirs(self.model_path)
-        self.logger = Logger(base_path + '/rewards.log')
+
+        self.logger = Logger(self.base_path + '/rewards.log')
 
         self.env              = env
         self.agent            = agent
@@ -130,3 +139,5 @@ class Trainer:
                         ag.save(self.model_path, e, i)
 
             print()
+
+        print('Saved data at {:s}'.format(self.base_path))

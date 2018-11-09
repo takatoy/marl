@@ -31,10 +31,10 @@ class SimpleDQN(Agent):
         self.train_cnt = 0
         self.memory = Memory(memory_size)
 
-        self.target_network = self.__get_model()
-        self.eval_network   = self.__get_model()
+        self.target_network = self._get_model()
+        self.eval_network   = self._get_model()
 
-    def __get_model(self):
+    def _get_model(self):
         obs_in = Input(shape=self.observation_space, dtype='float32')
 
         # DQN paper network
@@ -69,16 +69,16 @@ class SimpleDQN(Agent):
 
     def train(self):
         batch_obs, batch_action, batch_reward, batch_nobs = self.memory.sample(self.batch_size)
-        batch_target = self.__calc_target(batch_obs, batch_action, batch_reward, batch_nobs)
+        batch_target = self._calc_target(batch_obs, batch_action, batch_reward, batch_nobs)
         loss = self.eval_network.train_on_batch(batch_obs, batch_target)
 
         self.train_cnt += 1
         if self.train_cnt % self.target_update == 0:
-            self.__update_target()
+            self._update_target()
 
         return loss
 
-    def __calc_target(self, batch_obs, batch_action, batch_reward, batch_nobs):
+    def _calc_target(self, batch_obs, batch_action, batch_reward, batch_nobs):
         n = len(batch_action)
 
         target_q_vals = self.target_network.predict(batch_nobs, batch_size=self.batch_size)
@@ -91,7 +91,7 @@ class SimpleDQN(Agent):
 
         return targets
 
-    def __update_target(self):
+    def _update_target(self):
         self.target_network.set_weights(self.eval_network.get_weights())
 
     def save(self, path, episode, i):
