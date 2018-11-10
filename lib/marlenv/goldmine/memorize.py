@@ -7,7 +7,6 @@ class GoldmineMV(GoldmineRV):
     """
     def __init__(self, agent_num, view_range, mem_period):
         self.mem_period = mem_period
-        self.cnt = 0
         super().__init__(agent_num, view_range)
         self.mem = np.zeros((self.agent_num, self.height, self.width))
 
@@ -22,7 +21,4 @@ class GoldmineMV(GoldmineRV):
         self.mem = np.where(self.mem > 0, self.mem + 1, self.mem)     # add 1 time step
         self.mem = np.where(mask, obs[:, :, :, 1], self.mem)          # update current obs
         obs[:, :, :, 1] = self.mem.astype(np.bool)
-        self.cnt += 1
-        if self.cnt > 10:
-            import pdb; pdb.set_trace()
         return obs
