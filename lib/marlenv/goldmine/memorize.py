@@ -5,18 +5,24 @@ class GoldmineMV(GoldmineRV):
     """
     MV stands for memorized view
     """
-    def __init__(self, agent_num, view_range, mem_period, mem_range):
+    def __init__(self, agent_num, view_range, mem_period):
         self.mem_period = mem_period
-        self.mem_range = mem_range
+        self.cnt = 0
         super().__init__(agent_num, view_range)
+        self.mem = np.zeros((self.agent_num, self.height, self.width))
 
-        self.prev_task_state = np.zeros((self.mem_period, self.height, self.width))
-
-    def step(self, action):
-        obs, reward, done, info = super().__init__(action)
-        self.prev_task_state = np.roll(self.prev_task_state, 1, axis=0)
-        self.prev_task_state[0] = self.task_state
-        return obs, reward, done, info
+    def reset(self):
+        self.mem = np.zeros((self.agent_num, self.height, self.width))
+        return super().reset()
 
     def _get_observation(self):
         obs = super()._get_observation()
+        mask = self._get_rv_mask()
+        self.mem = np.where(self.mem > self.mem_period, 0, self.mem)  # remove expired task
+        self.mem = np.where(self.mem > 0, self.mem + 1, self.mem)     # add 1 time step
+        self.mem = np.where(mask, obs[:, :, :, 1], self.mem)          # update current obs
+        obs[:, :, :, 1] = self.mem.astype(np.bool)
+        self.cnt += 1
+        if self.cnt > 10:
+            import pdb; pdb.set_trace()
+        return obs

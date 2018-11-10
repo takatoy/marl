@@ -3,7 +3,7 @@ from agent.util import EpsilonLinearDecay
 from marlenv.goldmine.basic import Goldmine
 from agent.deepq.simple_dqn import SimpleDQN
 
-agent_num = 3
+agent_num = 6
 env = Goldmine(agent_num)
 
 params = {
