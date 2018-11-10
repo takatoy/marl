@@ -3,7 +3,7 @@ from agent.util import EpsilonLinearDecay
 from marlenv.goldmine.memorize import GoldmineMV
 from agent.deepq.simple_dqn import SimpleDQN
 
-agent_num = 1
+agent_num = 6
 view_range = 3
 mem_period = 10
 env = GoldmineMV(agent_num, view_range, mem_period)
