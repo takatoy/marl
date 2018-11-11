@@ -19,6 +19,6 @@ class GoldmineMV(GoldmineRV):
         mask = self._get_rv_mask()
         self.mem = np.where(self.mem > self.mem_period, 0, self.mem)  # remove expired task
         self.mem = np.where(self.mem > 0, self.mem + 1, self.mem)     # add 1 time step
-        self.mem = np.where(mask, obs[:, :, :, 1], self.mem)          # update current obs
+        self.mem = np.where(mask, obs[:, :, :, 1], self.mem)          # overwrite current obs
         obs[:, :, :, 1] = self.mem.astype(np.bool)
         return obs
