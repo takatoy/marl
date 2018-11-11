@@ -1,6 +1,7 @@
 from trainer import Trainer
 from agent.util import EpsilonLinearDecay
 from marlenv.goldmine.basic import Goldmine
+from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
 
 agent_num = 6
@@ -20,6 +21,7 @@ params = {
     'env'               : env,
     'action_space'      : env.action_space,
     'preprocess'        : None,
+    'recorder'          : GoldmineRecorder(agent_num),
 
     'agent': [
         SimpleDQN(

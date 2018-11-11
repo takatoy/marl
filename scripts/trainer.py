@@ -2,7 +2,6 @@ import os, sys
 import shutil
 import numpy as np
 from datetime import datetime as dt
-from marlenv.util import GoldmineRecorder
 
 class Logger:
     def __init__(self, path):
@@ -15,7 +14,7 @@ class Logger:
 class Trainer:
     def __init__(self, env, agent, name, episodes, steps, no_op_episodes,
                  epsilon, train_every, save_model_every, agent_num, action_space,
-                 preprocess=None, is_centralized=False):
+                 recorder=None, preprocess=None, is_centralized=False):
 
         # Base saving path
         tstr = dt.now().strftime('%Y%m%d_%H%M%S')
@@ -48,6 +47,7 @@ class Trainer:
         self.save_model_every = save_model_every
         self.agent_num        = agent_num
         self.action_space     = action_space
+        self.recorder         = recorder
         self.preprocess       = preprocess
         self.is_centralized   = is_centralized
 
@@ -86,13 +86,13 @@ class Trainer:
             eps = self.epsilon.get(e)
             print('epsilon: {:.4f}'.format(eps))
 
-            recorder = GoldmineRecorder(e, self.record_path, self.agent_num)
+            self.recorder.begin_episode(self.record_path, e)
 
             obs = self.env.reset()
             if self.preprocess is not None:
                 obs = self.preprocess(obs)
 
-            recorder.record(self.env.render())
+            self.recorder.record(self.env.render())
 
             total_reward = 0
             total_loss = 0.0
@@ -122,9 +122,9 @@ class Trainer:
                             train_cnt += 1
 
                 obs = nobs
-                recorder.record(self.env.render())
+                self.recorder.record(self.env.render())
 
-            recorder.close()
+            self.recorder.end_episode()
 
             ave_loss = total_loss / train_cnt
             print('total reward: {:.2f}, average loss: {:.4f}'.format(total_reward, ave_loss))

@@ -2,6 +2,7 @@ import numpy as np
 from trainer import Trainer
 from agent.util import EpsilonLinearDecay
 from marlenv.goldmine.basic import Goldmine
+from marlenv.util import GoldmineRecorder
 from agent.deepq.centralized_dqn import CentralizedDQN
 
 agent_num = 3
@@ -28,6 +29,7 @@ params = {
     'env'               : env,
     'action_space'      : env.action_space,
     'preprocess'        : preprocess,
+    'recorder'          : GoldmineRecorder(agent_num),
 
     'agent':
         CentralizedDQN(
