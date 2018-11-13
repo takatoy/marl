@@ -33,10 +33,10 @@ class EpsilonExponentialDecay:
         return self.init * (self.rate ** e)
 
 class EpsilonLinearDecay:
-    def __init__(self, init, end, epochs):
+    def __init__(self, init, end, episodes):
         self.init = init
         self.end = end
-        self.epochs = epochs
+        self.episodes = episodes
 
     def get(self, e):
-        return max(self.init - (self.init - self.end) / self.epochs * e, self.end)
+        return max(self.init - (self.init - self.end) / self.episodes * e, self.end)

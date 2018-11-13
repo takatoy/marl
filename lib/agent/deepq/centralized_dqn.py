@@ -92,12 +92,12 @@ class CentralizedDQN(Agent):
     def _update_target(self):
         self.target_network.set_weights(self.eval_network.get_weights())
 
-    def save(self, path, epoch):
+    def save(self, path, episode):
         if not os.path.exists(path):
             os.makedirs(path)
-        self.target_network.save(path + '/target_network_{:06d}'.format(epoch) + '.h5')
-        self.eval_network.save(path + '/eval_network_{:06d}'.format(epoch) + '.h5')
+        self.target_network.save(path + '/target_network_{:06d}'.format(episode) + '.h5')
+        self.eval_network.save(path + '/eval_network_{:06d}'.format(episode) + '.h5')
 
-    def load(self, path, epoch):
-        self.target_network = load_model(path + '/target_network_{:06d}'.format(epoch) + '.h5')
-        self.eval_network = load_model(path + '/eval_network_{:06d}'.format(epoch) + '.h5')
+    def load(self, path, episode):
+        self.target_network = load_model(path + '/target_network_{:06d}'.format(episode) + '.h5')
+        self.eval_network = load_model(path + '/eval_network_{:06d}'.format(episode) + '.h5')
