@@ -7,14 +7,14 @@ class Goldmine(Env):
 
     Actions: 0: Move Up, 1: Move Right, 2: Move Down, 3: Move Left
     """
-    def __init__(self, agent_num):
+    def __init__(self, agent_num, task_num):
         # parameters
         self.height = 20
         self.width = 20
         self.agent_num = agent_num
+        self.task_num = task_num
         self.action_space = 4
         self.observation_space = (self.height, self.width, 3)  # self position, task positions, other agents positions
-        self.task_num = 25
 
         # variables
         self.step_cnt = 0

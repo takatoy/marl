@@ -6,7 +6,8 @@ from marlenv.util import GoldmineRecorder
 from agent.deepq.centralized_dqn import CentralizedDQN
 
 agent_num = 3
-env = Goldmine(agent_num)
+task_num = 25
+env = Goldmine(agent_num, task_num)
 observation_space = env.observation_space[0:2] + (4,)
 
 def preprocess(obs):

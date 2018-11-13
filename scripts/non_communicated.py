@@ -5,7 +5,8 @@ from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
 
 agent_num = 6
-env = Goldmine(agent_num)
+task_num = 25
+env = Goldmine(agent_num, task_num)
 
 params = {
     'name'              : 'non_communicated',

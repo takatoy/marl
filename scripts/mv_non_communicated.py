@@ -5,9 +5,10 @@ from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
 
 agent_num = 6
+task_num = 25
 view_range = 3
 mem_period = 10
-env = GoldmineMV(agent_num, view_range, mem_period)
+env = GoldmineMV(agent_num, task_num, view_range, mem_period)
 
 params = {
     'name'              : 'mv_non_communicated',

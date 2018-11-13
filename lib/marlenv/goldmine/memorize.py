@@ -5,9 +5,9 @@ class GoldmineMV(GoldmineRV):
     """
     MV stands for memorized view
     """
-    def __init__(self, agent_num, view_range, mem_period):
+    def __init__(self, agent_num, task_num, view_range, mem_period):
         self.mem_period = mem_period
-        super().__init__(agent_num, view_range)
+        super().__init__(agent_num, task_num, view_range)
         self.mem = np.zeros((self.agent_num, self.height, self.width))
 
     def reset(self):

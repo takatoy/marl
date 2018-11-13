@@ -5,9 +5,9 @@ class GoldmineRV(Goldmine):
     """
     RV stands for relative view
     """
-    def __init__(self, agent_num, view_range):
+    def __init__(self, agent_num, task_num, view_range):
         self.view_range = view_range
-        super().__init__(agent_num)
+        super().__init__(agent_num, task_num)
 
     def _get_observation(self):
         obs = super()._get_observation()
