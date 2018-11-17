@@ -1,7 +1,8 @@
-import os, sys
+import os
+import sys
 import shutil
-import numpy as np
 from datetime import datetime as dt
+import numpy as np
 
 class Logger:
     def __init__(self, path):
@@ -62,7 +63,7 @@ class Trainer:
 
             for s in range(self.steps):
                 action = np.random.choice(np.arange(self.action_space, dtype=np.int16), self.agent_num)
-                nobs, reward, done, _ = self.env.step(action)
+                nobs, reward, _, _ = self.env.step(action)
 
                 if self.preprocess is not None:
                     nobs = self.preprocess(nobs)

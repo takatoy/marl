@@ -1,5 +1,5 @@
 import numpy as np
-from trainer import Trainer
+from agent.trainer import Trainer
 from agent.util import EpsilonLinearDecay
 from marlenv.goldmine.basic import Goldmine
 from marlenv.util import GoldmineRecorder

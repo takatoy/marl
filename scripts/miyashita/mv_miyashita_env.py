@@ -1,20 +1,22 @@
 from agent.trainer import Trainer
-from agent.util import EpsilonLinearDecay
-from marlenv.goldmine.basic import Goldmine
+from agent.util import EpsilonExponentialDecay
+from marlenv.goldmine.memorize import GoldmineMV
 from marlenv.util import GoldmineRecorder
-from agent.deepq.simple_dqn import SimpleDQN
+from agent.deepq.miyashita_dqn import MiyashitaDQN
 
 agent_num = 6
-task_num = 25
-env = Goldmine(agent_num, task_num)
+task_num = 4
+view_range = 3
+mem_period = 10
+env = GoldmineMV(agent_num, task_num, view_range, mem_period)
 
 params = {
-    'name'              : 'non_communicated',
+    'name'              : 'rv_miyashita_env',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
-    'epsilon'           : EpsilonLinearDecay(init=1.0, end=0.05, episodes=5000),
-    'train_every'       : 8,
+    'epsilon'           : EpsilonExponentialDecay(init=1.0, rate=0.9999),
+    'train_every'       : 1,
     'save_model_every'  : 1000,
     'is_centralized'    : False,
 
@@ -25,15 +27,14 @@ params = {
     'recorder'          : GoldmineRecorder(agent_num),
 
     'agent': [
-        SimpleDQN(
+        MiyashitaDQN(
             action_space      = env.action_space,
             observation_space = env.observation_space,
-            memory_size       = 40000,
-            batch_size        = 256,
-            learning_rate     = 0.00025,
+            memory_size       = 2000,
+            batch_size        = 32,
+            learning_rate     = 0.0001,
             gamma             = 0.99,
-            target_update     = 200,
-            use_dueling       = False
+            target_update     = 200
         ) for _ in range(agent_num)
     ]
 }

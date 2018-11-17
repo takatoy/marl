@@ -1,4 +1,4 @@
-from trainer import Trainer
+from agent.trainer import Trainer
 from agent.util import EpsilonLinearDecay
 from marlenv.goldmine.memorize import GoldmineMV
 from marlenv.util import GoldmineRecorder
