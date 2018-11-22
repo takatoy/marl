@@ -13,9 +13,9 @@ class Logger:
         self.log_fp.write('{:d},{:.6f},{:.6f}\n'.format(episode, reward, loss))
 
 class Trainer:
-    def __init__(self, env, agent, name, episodes, steps, no_op_episodes,
-                 epsilon, train_every, save_model_every, agent_num, action_space,
-                 recorder=None, preprocess=None, is_centralized=False):
+    def __init__(self, env, agent, name, episodes, steps, no_op_episodes, epsilon,
+                 train_every, save_model_every, agent_num, action_space, observation_space,
+                 recorder=None, preprocess=None, is_centralized=False, obs_num=1):
 
         # Base saving path
         tstr = dt.now().strftime('%Y%m%d_%H%M%S')
@@ -37,33 +37,47 @@ class Trainer:
 
         self.logger = Logger(self.base_path + '/rewards.log')
 
-        self.env              = env
-        self.agent            = agent
-        self.name             = name
-        self.episodes         = episodes
-        self.steps            = steps
-        self.no_op_episodes   = no_op_episodes
-        self.epsilon          = epsilon
-        self.train_every      = train_every
-        self.save_model_every = save_model_every
-        self.agent_num        = agent_num
-        self.action_space     = action_space
-        self.recorder         = recorder
-        self.preprocess       = preprocess
-        self.is_centralized   = is_centralized
+        self.env               = env
+        self.agent             = agent
+        self.name              = name
+        self.episodes          = episodes
+        self.steps             = steps
+        self.no_op_episodes    = no_op_episodes
+        self.epsilon           = epsilon
+        self.train_every       = train_every
+        self.save_model_every  = save_model_every
+        self.agent_num         = agent_num
+        self.action_space      = action_space
+        self.observation_space = observation_space
+        self.recorder          = recorder
+        self.preprocess        = preprocess
+        self.is_centralized    = is_centralized
+        self.obs_num           = obs_num
+        self.obs_queue         = np.zeros((agent_num, obs_num,) + observation_space)
 
     def train(self):
         # Run agents with random actions to gather experience
         print('Gathering random experiences...', end = '', flush=True)
 
         for e in range(self.no_op_episodes):
+            self.obs_queue = np.zeros_like(self.obs_queue)
+
             obs = self.env.reset()
+            if self.obs_num > 1:
+                self.obs_queue[:, 0] = obs
+                obs = np.array(self.obs_queue)
+
             if self.preprocess is not None:
                 obs = self.preprocess(obs)
 
             for s in range(self.steps):
                 action = np.random.choice(np.arange(self.action_space, dtype=np.int16), self.agent_num)
                 nobs, reward, _, _ = self.env.step(action)
+
+                if self.obs_num > 1:
+                    self.obs_queue = np.roll(self.obs_queue, 1, axis=1)
+                    self.obs_queue[:, 0] = nobs
+                    nobs = np.array(self.obs_queue)
 
                 if self.preprocess is not None:
                     nobs = self.preprocess(nobs)
@@ -89,7 +103,13 @@ class Trainer:
 
             self.recorder.begin_episode(self.record_path, e)
 
+            self.obs_queue = np.zeros_like(self.obs_queue)
+
             obs = self.env.reset()
+            if self.obs_num > 1:
+                self.obs_queue[:, 0] = obs
+                obs = np.array(self.obs_queue)
+
             if self.preprocess is not None:
                 obs = self.preprocess(obs)
 
@@ -104,8 +124,13 @@ class Trainer:
                 else:
                     action = [ag.get_action(obs[i], eps) for i, ag in enumerate(self.agent)]
 
-                nobs, reward, done, _ = self.env.step(np.array(action, dtype=np.int16))
+                nobs, reward, _, _ = self.env.step(np.array(action, dtype=np.int16))
                 total_reward += reward.sum()
+
+                if self.obs_num > 1:
+                    self.obs_queue = np.roll(self.obs_queue, 1, axis=1)
+                    self.obs_queue[:, 0] = nobs
+                    nobs = np.array(self.obs_queue)
 
                 if self.preprocess is not None:
                     nobs = self.preprocess(nobs)

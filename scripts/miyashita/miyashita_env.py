@@ -21,6 +21,7 @@ params = {
     'agent_num'         : agent_num,
     'env'               : env,
     'action_space'      : env.action_space,
+    'observation_space' : env.observation_space,
     'preprocess'        : None,
     'recorder'          : GoldmineRecorder(agent_num),
 
