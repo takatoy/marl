@@ -1,5 +1,5 @@
 from agent.trainer import Trainer
-from agent.util import EpsilonLinearDecay
+from agent.util import EpsilonExponentialDecay
 from marlenv.goldmine.basic import Goldmine
 from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
@@ -13,7 +13,7 @@ params = {
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
-    'epsilon'           : EpsilonLinearDecay(init=1.0, end=0.05, episodes=5000),
+    'epsilon'           : EpsilonExponentialDecay(init=1.0, rate=0.9998),
     'train_every'       : 8,
     'save_model_every'  : 1000,
     'is_centralized'    : False,
