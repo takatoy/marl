@@ -36,7 +36,7 @@ class MiyashitaDQN(Agent):
     def _get_model(self):
         obs_in = Input(shape=self.observation_space, dtype='float32')
 
-        # DQN paper network
+        # DQN paper-like network
         x = Conv2D(8, 2, 1, padding='same')(obs_in)
         x = MaxPooling2D(2, 2)(x)
         x = Conv2D(16, 2, 1, padding='same')(x)
