@@ -1,14 +1,7 @@
-import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
 from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras import backend as K
 from agent.deepq.simple_dqn import SimpleDQN
-
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-sess = tf.Session(config=config)
-K.set_session(sess)
 
 class LightDQN(SimpleDQN):
     def _get_model(self):
