@@ -10,6 +10,7 @@ hyperdash = "*"
 tensorflow = {version = "*", sys_platform = "== 'darwin'"}
 tensorflow-gpu = {version = "*", sys_platform = "!= 'darwin'"}
 numpy = "*"
+keras = "*"
 
 [dev-packages]
 

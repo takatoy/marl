@@ -1,6 +1,6 @@
-from tensorflow.keras.models import Model
-from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
-from tensorflow.keras.optimizers import RMSprop
+from keras.models import Model
+from keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
+from keras.optimizers import RMSprop
 from agent.deepq.simple_dqn import SimpleDQN
 
 class LightDQN(SimpleDQN):

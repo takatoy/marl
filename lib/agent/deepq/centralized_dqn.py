@@ -1,10 +1,11 @@
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras import backend as K
+from keras.models import Model, load_model
+from keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
+from keras.optimizers import RMSprop
+from keras.utils import multi_gpu_model
+from keras import backend as K
 
 from agent.agent import Agent
 from agent.util import Memory
@@ -45,6 +46,12 @@ class CentralizedDQN(Agent):
 
         model = Model(inputs=obs_in, outputs=q_vals)
         optimizer = RMSprop(lr=self.learning_rate)
+
+        try:
+            model = multi_gpu_model(model, gpus=None)
+        except:
+            pass
+
         model.compile(loss='mean_squared_error', optimizer=optimizer)
 
         return model
