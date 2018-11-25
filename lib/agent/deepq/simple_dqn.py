@@ -17,7 +17,8 @@ K.set_session(sess)
 
 class SimpleDQN(Agent):
     def __init__(self, action_space, observation_space, memory_size,
-                 batch_size, learning_rate, gamma, target_update, use_dueling):
+                 batch_size, learning_rate, gamma, target_update,
+                 use_dueling, gpu_num=1):
         # parameters
         self.observation_space = observation_space
         self.action_space      = action_space
@@ -27,6 +28,7 @@ class SimpleDQN(Agent):
         self.gamma             = gamma
         self.target_update     = target_update
         self.use_dueling       = use_dueling
+        self.gpu_num           = gpu_num
 
         # variables
         self.train_cnt = 0
@@ -56,11 +58,11 @@ class SimpleDQN(Agent):
         model = Model(inputs=obs_in, outputs=q_vals)
         optimizer = RMSprop(lr=self.learning_rate)
 
-        try:
-            model = multi_gpu_model(model, gpus=None)
-            print('* Using multiple gpus.')
-        except Exception as e:
-            print(e)
+        if self.gpu_num > 1:
+            try:
+                model = multi_gpu_model(model, gpus=self.gpu_num)
+            except:
+                pass
 
         model.compile(loss='mean_squared_error', optimizer=optimizer)
 
