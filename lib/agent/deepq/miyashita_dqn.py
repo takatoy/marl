@@ -8,9 +8,9 @@ class MiyashitaDQN(SimpleDQN):
         obs_in = Input(shape=self.observation_space, dtype='float32')
 
         # DQN paper-like network
-        x = Conv2D(8, 2, 1, padding='same')(obs_in)
+        x = Conv2D(8, kernel_size=2, strides=1, padding='same')(obs_in)
         x = MaxPooling2D(2, 2)(x)
-        x = Conv2D(16, 2, 1, padding='same')(x)
+        x = Conv2D(16, kernel_size=2, strides=1, padding='same')(x)
         x = MaxPooling2D(2, 2)(x)
         x = Flatten()(x)
         x = Dense(100, activation='relu')(x)

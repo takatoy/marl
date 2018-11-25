@@ -37,9 +37,9 @@ class CentralizedDQN(Agent):
 
     def _get_model(self):
         obs_in = Input(shape=self.observation_space, dtype='float32')
-        x = Conv2D(32, 8, 4, padding='same', activation='relu')(obs_in)
-        x = Conv2D(64, 4, 2, padding='same', activation='relu')(x)
-        x = Conv2D(64, 3, 1, padding='same', activation='relu')(x)
+        x = Conv2D(32, kernel_size=8, strides=4, padding='same', activation='relu')(obs_in)
+        x = Conv2D(64, kernel_size=4, strides=2, padding='same', activation='relu')(x)
+        x = Conv2D(64, kernel_size=3, strides=1, padding='same', activation='relu')(x)
         x = Flatten()(x)
         x = Dense(512, activation='relu')(x)
         q_vals = Dense(self.action_space ** self.agent_num)(x)
