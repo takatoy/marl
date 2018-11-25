@@ -5,7 +5,7 @@ from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
 
 agent_num = 6
-task_num = 25
+task_num = 4
 env = Goldmine(agent_num, task_num)
 
 params = {
@@ -29,9 +29,9 @@ params = {
         SimpleDQN(
             action_space      = env.action_space,
             observation_space = env.observation_space,
-            memory_size       = 40000,
+            memory_size       = 2000,
             batch_size        = 256,
-            learning_rate     = 0.00025,
+            learning_rate     = 0.0001,
             gamma             = 0.99,
             target_update     = 200,
             use_dueling       = False
