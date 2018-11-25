@@ -8,11 +8,10 @@ class LightDQN(SimpleDQN):
         obs_in = Input(shape=self.observation_space, dtype='float32')
 
         # Light network
-        x = Conv2D(8,  2, 1, padding='same', activation='relu')(obs_in)
-        x = Conv2D(16, 2, 1, padding='same', activation='relu')(x)
+        x = Conv2D(8, 2, 1, padding='same', activation='relu')(obs_in)
         x = Conv2D(16, 2, 1, padding='same', activation='relu')(x)
         x = Flatten()(x)
-        x = Dense(64, activation='relu')(x)
+        x = Dense(128, activation='relu')(x)
 
         if self.use_dueling:
             value = Dense(1)(x)
