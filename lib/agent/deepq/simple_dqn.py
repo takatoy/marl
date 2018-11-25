@@ -4,6 +4,7 @@ import tensorflow as tf
 from tensorflow.keras.models import Model, load_model
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
 from tensorflow.keras.optimizers import RMSprop
+from tensorflow.keras.utils import multi_gpu_model
 from tensorflow.keras import backend as K
 
 from agent.agent import Agent
@@ -16,7 +17,8 @@ K.set_session(sess)
 
 class SimpleDQN(Agent):
     def __init__(self, action_space, observation_space, memory_size,
-                 batch_size, learning_rate, gamma, target_update, use_dueling):
+                 batch_size, learning_rate, gamma, target_update,
+                 use_dueling, gpu_num=1):
         # parameters
         self.observation_space = observation_space
         self.action_space      = action_space
@@ -26,6 +28,7 @@ class SimpleDQN(Agent):
         self.gamma             = gamma
         self.target_update     = target_update
         self.use_dueling       = use_dueling
+        self.gpu_num           = gpu_num
 
         # variables
         self.train_cnt = 0
@@ -54,6 +57,10 @@ class SimpleDQN(Agent):
 
         model = Model(inputs=obs_in, outputs=q_vals)
         optimizer = RMSprop(lr=self.learning_rate)
+
+        if self.gpu_num > 1:
+            model = multi_gpu_model(model, gpus=self.gpu_num)
+
         model.compile(loss='mean_squared_error', optimizer=optimizer)
 
         return model
