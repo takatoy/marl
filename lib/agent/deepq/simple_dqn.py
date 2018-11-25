@@ -1,11 +1,11 @@
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.utils import multi_gpu_model
-from tensorflow.keras import backend as K
+from keras.models import Model, load_model
+from keras.layers import Input, Conv2D, Dense, Flatten, Lambda, concatenate, MaxPooling2D
+from keras.optimizers import RMSprop
+from keras.utils import multi_gpu_model
+from keras import backend as K
 
 from agent.agent import Agent
 from agent.util import Memory
