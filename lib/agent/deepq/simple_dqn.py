@@ -59,8 +59,8 @@ class SimpleDQN(Agent):
         try:
             model = multi_gpu_model(model, gpus=None)
             print('* Using multiple gpus.')
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
         model.compile(loss='mean_squared_error', optimizer=optimizer)
 
