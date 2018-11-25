@@ -58,6 +58,7 @@ class SimpleDQN(Agent):
 
         try:
             model = multi_gpu_model(model, gpus=None)
+            print('* Using multiple gpus.')
         except:
             pass
 
