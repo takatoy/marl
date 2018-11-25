@@ -9,7 +9,7 @@ task_num = 25
 env = Goldmine(agent_num, task_num)
 
 params = {
-    'name'              : 'non_communicated',
+    'name'              : 'simple',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,

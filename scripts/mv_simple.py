@@ -11,7 +11,7 @@ mem_period = 10
 env = GoldmineMV(agent_num, task_num, view_range, mem_period)
 
 params = {
-    'name'              : 'mv_non_communicated',
+    'name'              : 'mv_simple',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,

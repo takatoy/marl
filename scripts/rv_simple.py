@@ -10,7 +10,7 @@ view_range = 3
 env = GoldmineRV(agent_num, task_num, view_range)
 
 params = {
-    'name'              : 'rv_non_communicated',
+    'name'              : 'rv_simple',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
