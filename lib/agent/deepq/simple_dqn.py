@@ -11,7 +11,6 @@ from agent.agent import Agent
 from agent.util import Memory
 
 config = tf.ConfigProto()
-config.graph_options.optimizer_options.global_jit_level = tf.OptimizerOptions.ON_1
 config.gpu_options.allow_growth = True
 sess = tf.Session(config=config)
 K.set_session(sess)
