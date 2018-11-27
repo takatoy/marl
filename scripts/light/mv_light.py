@@ -5,7 +5,7 @@ from marlenv.util import GoldmineRecorder
 from agent.deepq.light_dqn import LightDQN
 
 agent_num = 6
-task_num = 4
+task_num = 3
 view_range = 3
 mem_period = 10
 env = GoldmineMV(agent_num, task_num, view_range, mem_period)
@@ -33,7 +33,7 @@ params = {
             observation_space = env.observation_space,
             memory_size       = 2000,
             batch_size        = 256,
-            learning_rate     = 0.0001,
+            learning_rate     = 0.00025,
             gamma             = 0.99,
             target_update     = 200,
             use_dueling       = False
