@@ -9,7 +9,7 @@ task_num = 4
 env = Goldmine(agent_num, task_num)
 
 params = {
-    'name'              : 'miyashita_env',
+    'name'              : 'miyashita',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,

@@ -10,7 +10,7 @@ view_range = 3
 env = GoldmineRV(agent_num, task_num, view_range)
 
 params = {
-    'name'              : 'rv_miyashita_env',
+    'name'              : 'rv_miyashita',
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
