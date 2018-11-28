@@ -29,9 +29,9 @@ params = {
         LightDQN(
             action_space      = env.action_space,
             observation_space = env.observation_space,
-            memory_size       = 2000,
+            memory_size       = 20000,
             batch_size        = 256,
-            learning_rate     = 0.0001,
+            learning_rate     = 0.0002,
             gamma             = 0.99,
             target_update     = 200,
             use_dueling       = False
