@@ -18,7 +18,7 @@ K.set_session(sess)
 class SimpleDQN(Agent):
     def __init__(self, action_space, observation_space, memory_size,
                  batch_size, learning_rate, gamma, target_update,
-                 use_dueling, gpu_num=1):
+                 use_dueling=False, gpu_num=1):
         # parameters
         self.observation_space = observation_space
         self.action_space      = action_space
