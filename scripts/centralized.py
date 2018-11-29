@@ -5,10 +5,14 @@ from marlenv.goldmine.basic import Goldmine
 from marlenv.util import GoldmineRecorder
 from agent.deepq.centralized_dqn import CentralizedDQN
 
+name = 'centralized'
+exp = Experiment(name)
+
 agent_num = 3
 task_num = 4
 env = Goldmine(agent_num, task_num)
 observation_space = env.observation_space[0:2] + (4,)
+env.seed(0)
 
 def preprocess(obs):
     return np.concatenate([
@@ -17,7 +21,7 @@ def preprocess(obs):
         axis=2)
 
 params = {
-    'name'              : 'centralized',
+    'name'              : exp,
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
@@ -43,8 +47,12 @@ params = {
             learning_rate     = 0.00025,
             gamma             = 0.99,
             target_update     = 200
-        )
+        ),
+
+    'hyperdash': exp
 }
 
 trainer = Trainer(**params)
 trainer.train()
+
+exp.end()

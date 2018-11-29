@@ -9,6 +9,7 @@ agent_num = 6
 task_num = 4
 view_range = 3
 env = GoldmineRV(agent_num, task_num, view_range)
+env.seed(0)
 obs_num = 3
 observation_space = env.observation_space[0:2] + (env.observation_space[2] * obs_num,)
 

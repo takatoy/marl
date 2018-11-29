@@ -7,6 +7,7 @@ from agent.deepq.light_dqn import LightDQN
 agent_num = 6
 task_num = 4
 env = Goldmine(agent_num, task_num)
+env.seed(0)
 
 params = {
     'name'              : 'light',

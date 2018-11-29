@@ -8,6 +8,7 @@ agent_num = 6
 task_num = 4
 view_range = 3
 env = GoldmineRV(agent_num, task_num, view_range)
+env.seed(0)
 
 params = {
     'name'              : 'rv_miyashita',

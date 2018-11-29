@@ -7,6 +7,7 @@ from agent.deepq.miyashita_dqn import MiyashitaDQN
 agent_num = 6
 task_num = 4
 env = Goldmine(agent_num, task_num)
+env.seed(0)
 
 params = {
     'name'              : 'miyashita',

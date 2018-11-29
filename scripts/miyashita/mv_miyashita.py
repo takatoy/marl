@@ -9,6 +9,7 @@ task_num = 4
 view_range = 3
 mem_period = 10
 env = GoldmineMV(agent_num, task_num, view_range, mem_period)
+env.seed(0)
 
 params = {
     'name'              : 'mv_miyashita',

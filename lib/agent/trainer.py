@@ -13,9 +13,11 @@ class Logger:
         self.log_fp.write('{:d},{:.6f},{:.6f}\n'.format(episode, reward, loss))
 
 class Trainer:
-    def __init__(self, name, env, agent, episodes, steps, no_op_episodes, epsilon,
-                 train_every, save_model_every, agent_num, action_space, observation_space,
-                 recorder=None, record_every=10, preprocess=None, is_centralized=False, obs_num=1):
+    def __init__(self, name, env, agent, episodes, steps,
+                 no_op_episodes, epsilon, train_every, save_model_every,
+                 agent_num, action_space, observation_space,
+                 recorder=None, record_every=10, preprocess=None,
+                 is_centralized=False, obs_num=1, hyperdash=None):
 
         # Base saving path
         tstr = dt.now().strftime('%Y%m%d_%H%M%S')
@@ -59,6 +61,7 @@ class Trainer:
         self.preprocess        = preprocess
         self.is_centralized    = is_centralized
         self.obs_num           = obs_num
+        self.hyperdash         = hyperdash
 
     def _episode(self, epsilon, do_train=False, do_memorize=False, record_path=""):
         obs_queue = np.zeros((self.agent_num, self.obs_num,) + self.observation_space)
@@ -139,6 +142,8 @@ class Trainer:
                 do_train=True, do_memorize=True, record_path=record_path)
             print('total reward: {:.2f}, average loss: {:.4f}'.format(total_reward, ave_loss))
             self.train_logger.log(e, total_reward, ave_loss)
+            if self.hyperdash is not None:
+                self.hyperdash.metric("train_reward", total_reward, log=False)
 
             ### Evaluation ###
             print('--- eval ---')
@@ -148,6 +153,8 @@ class Trainer:
                 do_train=False, do_memorize=False, record_path=record_path)
             print('total reward: {:.2f}'.format(total_reward))
             self.eval_logger.log(e, total_reward, 0.0)
+            if self.hyperdash is not None:
+                self.hyperdash.metric("eval_reward", total_reward, log=False)
 
             # Save model
             if (e + 1) % self.save_model_every == 0:

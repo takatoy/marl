@@ -1,16 +1,21 @@
+from hyperdash import Experiment
 from agent.trainer import Trainer
 from agent.util import EpsilonExponentialDecay
 from marlenv.goldmine.relative import GoldmineRV
 from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
 
+name = 'rv_simple'
+exp = Experiment(name)
+
 agent_num = 6
 task_num = 4
 view_range = 3
 env = GoldmineRV(agent_num, task_num, view_range)
+env.seed(0)
 
 params = {
-    'name'              : 'rv_simple',
+    'name'              : name,
     'episodes'          : 40000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
@@ -37,8 +42,12 @@ params = {
             target_update     = 200,
             use_dueling       = False
         ) for _ in range(agent_num)
-    ]
+    ],
+
+    'hyperdash', exp
 }
 
 trainer = Trainer(**params)
 trainer.train()
+
+exp.end()
