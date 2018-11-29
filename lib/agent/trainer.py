@@ -13,7 +13,7 @@ class Logger:
         self.log_fp.write('{:d},{:.6f},{:.6f}\n'.format(episode, reward, loss))
 
 class Trainer:
-    def __init__(self, env, agent, name, episodes, steps, no_op_episodes, epsilon,
+    def __init__(self, name, env, agent, episodes, steps, no_op_episodes, epsilon,
                  train_every, save_model_every, agent_num, action_space, observation_space,
                  recorder=None, record_every=10, preprocess=None, is_centralized=False, obs_num=1):
 
