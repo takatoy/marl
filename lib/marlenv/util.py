@@ -5,7 +5,7 @@ class Recorder:
     def __init__(self):
         pass
 
-    def begin_episode(self, record_path, episode):
+    def begin_episode(self, path):
         raise NotImplementedError
 
     def record(self, data):
@@ -16,10 +16,12 @@ class Recorder:
 
 class GoldmineRecorder(Recorder):
     def __init__(self, agent_num):
+        super().__init__()
         self.agent_num = agent_num
+        self.task_fp = None
+        self.agent_fp = None
 
-    def begin_episode(self, record_path, episode):
-        path = record_path + '/episode{:06d}'.format(episode)
+    def begin_episode(self, path):
         if not os.path.exists(path):
             os.makedirs(path)
         self.task_fp = open(path + '/task.log', 'w')

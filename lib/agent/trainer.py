@@ -15,7 +15,7 @@ class Logger:
 class Trainer:
     def __init__(self, env, agent, name, episodes, steps, no_op_episodes, epsilon,
                  train_every, save_model_every, agent_num, action_space, observation_space,
-                 recorder=None, preprocess=None, is_centralized=False, obs_num=1):
+                 recorder=None, record_every=10, preprocess=None, is_centralized=False, obs_num=1):
 
         # Base saving path
         tstr = dt.now().strftime('%Y%m%d_%H%M%S')
@@ -27,15 +27,20 @@ class Trainer:
         script_path = sys.argv[0]
         shutil.copy(script_path, self.base_path + '/script.py')
 
-        self.record_path = self.base_path + '/record'
-        if not os.path.exists(self.record_path):
-            os.makedirs(self.record_path)
+        self.train_record_path = self.base_path + '/train'
+        if not os.path.exists(self.train_record_path):
+            os.makedirs(self.train_record_path)
+
+        self.eval_record_path = self.base_path + '/eval'
+        if not os.path.exists(self.eval_record_path):
+            os.makedirs(self.eval_record_path)
 
         self.model_path = self.base_path + '/model'
         if not os.path.exists(self.model_path):
             os.makedirs(self.model_path)
 
-        self.logger = Logger(self.base_path + '/rewards.log')
+        self.train_logger = Logger(self.base_path + '/train.log')
+        self.eval_logger  = Logger(self.base_path + '/eval.log')
 
         self.env               = env
         self.agent             = agent
@@ -50,119 +55,107 @@ class Trainer:
         self.action_space      = action_space
         self.observation_space = observation_space
         self.recorder          = recorder
+        self.record_every      = record_every
         self.preprocess        = preprocess
         self.is_centralized    = is_centralized
         self.obs_num           = obs_num
-        self.obs_queue         = np.zeros((agent_num, obs_num,) + observation_space)
 
-    def train(self):
-        # Run agents with random actions to gather experience
-        print('Gathering random experiences...', end = '', flush=True)
+    def _episode(self, epsilon, do_train=False, do_memorize=False, record_path=""):
+        obs_queue = np.zeros((self.agent_num, self.obs_num,) + self.observation_space)
+        obs = self.env.reset()
+        if self.obs_num > 1:
+            obs_queue[:, 0] = obs
+            obs = np.array(obs_queue)
 
-        for e in range(self.no_op_episodes):
-            self.obs_queue = np.zeros_like(self.obs_queue)
+        if self.preprocess is not None:
+            obs = self.preprocess(obs)
 
-            obs = self.env.reset()
+        if record_path != "":
+            self.recorder.begin_episode(record_path)
+            self.recorder.record(self.env.render())
+
+        total_reward = 0
+        total_loss = 0.0
+        train_cnt = 0
+        for s in range(self.steps):
+            if self.is_centralized:
+                action = self.agent.get_action(obs, epsilon)
+            else:
+                action = [ag.get_action(obs[i], epsilon)
+                            for i, ag in enumerate(self.agent)]
+
+            nobs, reward, _, _ = self.env.step(np.array(action, dtype=np.int16))
+            total_reward += reward.sum()
+
             if self.obs_num > 1:
-                self.obs_queue[:, 0] = obs
-                obs = np.array(self.obs_queue)
+                obs_queue = np.roll(obs_queue, 1, axis=1)
+                obs_queue[:, 0] = nobs
+                nobs = np.array(obs_queue)
 
             if self.preprocess is not None:
-                obs = self.preprocess(obs)
+                nobs = self.preprocess(nobs)
 
-            for s in range(self.steps):
-                action = np.random.choice(np.arange(self.action_space, dtype=np.int16), self.agent_num)
-                nobs, reward, _, _ = self.env.step(action)
+            if self.is_centralized:
+                if do_memorize: self.agent.memory.add(obs, action, reward, nobs)
+                if do_train and (s + 1) % self.train_every == 0:
+                    total_loss += self.agent.train()
+                    train_cnt += 1
+            else:
+                for i, ag in enumerate(self.agent):
+                    if do_memorize: ag.memory.add(obs[i], action[i], reward[i], nobs[i])
+                    if do_train and (s + 1) % self.train_every == 0:
+                        total_loss += ag.train()
+                        train_cnt += 1
 
-                if self.obs_num > 1:
-                    self.obs_queue = np.roll(self.obs_queue, 1, axis=1)
-                    self.obs_queue[:, 0] = nobs
-                    nobs = np.array(self.obs_queue)
+            obs = nobs
+            if record_path != "":
+                self.recorder.record(self.env.render())
 
-                if self.preprocess is not None:
-                    nobs = self.preprocess(nobs)
+        if record_path != "":
+            self.recorder.end_episode()
 
-                if self.is_centralized:
-                    self.agent.memory.add(obs, action, reward, nobs)
-                else:
-                    for i, ag in enumerate(self.agent):
-                        ag.memory.add(obs[i], action[i], reward[i], nobs[i])
+        ave_loss = total_loss / train_cnt if train_cnt > 0 else 0
 
-                obs = nobs
+        return total_reward, ave_loss
 
+    def train(self):
+        # Run agents with random actions to collect experiences
+        print('Gathering random experiences...', end = '', flush=True)
+        for e in range(self.no_op_episodes):
+            self._episode(epsilon=1.0, do_train=False, do_memorize=True)
         print(' done!', flush=True)
 
         # Main loop
         for e in range(self.episodes):
-            print('***** episode {:d} *****'.format(e))
+            print('***** episode {:d} *****'.format(e + 1))
 
             ### Train ###
             print('--- train ---')
-            eps = self.epsilon.get(e)
-            print('epsilon: {:.4f}'.format(eps))
-
-            self.recorder.begin_episode(self.record_path, e)
-
-            self.obs_queue = np.zeros_like(self.obs_queue)
-
-            obs = self.env.reset()
-            if self.obs_num > 1:
-                self.obs_queue[:, 0] = obs
-                obs = np.array(self.obs_queue)
-
-            if self.preprocess is not None:
-                obs = self.preprocess(obs)
-
-            self.recorder.record(self.env.render())
-
-            total_reward = 0
-            total_loss = 0.0
-            train_cnt = 0
-            for s in range(self.steps):
-                if self.is_centralized:
-                    action = self.agent.get_action(obs, eps)
-                else:
-                    action = [ag.get_action(obs[i], eps) for i, ag in enumerate(self.agent)]
-
-                nobs, reward, _, _ = self.env.step(np.array(action, dtype=np.int16))
-                total_reward += reward.sum()
-
-                if self.obs_num > 1:
-                    self.obs_queue = np.roll(self.obs_queue, 1, axis=1)
-                    self.obs_queue[:, 0] = nobs
-                    nobs = np.array(self.obs_queue)
-
-                if self.preprocess is not None:
-                    nobs = self.preprocess(nobs)
-
-                if self.is_centralized:
-                    self.agent.memory.add(obs, action, reward, nobs)
-                    if (s + 1) % self.train_every == 0:
-                        total_loss += self.agent.train()
-                        train_cnt += 1
-                else:
-                    for i, ag in enumerate(self.agent):
-                        ag.memory.add(obs[i], action[i], reward[i], nobs[i])
-                        if (s + 1) % self.train_every == 0:
-                            total_loss += ag.train()
-                            train_cnt += 1
-
-                obs = nobs
-                self.recorder.record(self.env.render())
-
-            self.recorder.end_episode()
-
-            ave_loss = total_loss / train_cnt
+            epsilon = self.epsilon.get(e)
+            print('epsilon: {:.4f}'.format(epsilon))
+            record_path = self.train_record_path + '/episode{:05d}'.format(e + 1) \
+                if (e + 1) % self.record_every == 0 else ""
+            total_reward, ave_loss = self._episode(epsilon=epsilon,
+                do_train=True, do_memorize=True, record_path=record_path)
             print('total reward: {:.2f}, average loss: {:.4f}'.format(total_reward, ave_loss))
-            self.logger.log(e, total_reward, ave_loss)
+            self.train_logger.log(e, total_reward, ave_loss)
+
+            ### Evaluation ###
+            print('--- eval ---')
+            record_path = self.eval_record_path + '/episode{:05d}'.format(e + 1) \
+                if (e + 1) % self.record_every == 0 else ""
+            total_reward, _ = self._episode(epsilon=0.0,
+                do_train=False, do_memorize=False, record_path=record_path)
+            print('total reward: {:.2f}'.format(total_reward))
+            self.eval_logger.log(e, total_reward, 0.0)
 
             # Save model
             if (e + 1) % self.save_model_every == 0:
                 if self.is_centralized:
-                    self.agent.save(self.model_path, e)
+                    self.agent.save(self.model_path, e + 1)
                 else:
                     for i, ag in enumerate(self.agent):
-                        ag.save(self.model_path, e, i)
+                        ag.save(self.model_path, e + 1, i)
 
             print()
 

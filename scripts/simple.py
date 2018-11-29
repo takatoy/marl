@@ -4,7 +4,7 @@ from marlenv.goldmine.basic import Goldmine
 from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
 
-agent_num = 6
+agent_num = 1
 task_num = 4
 env = Goldmine(agent_num, task_num)
 
