@@ -55,6 +55,8 @@ class Goldmine(Env):
         assert len(action) == self.agent_num
         assert action.dtype == 'int16'
 
+        self.step_cnt += 1
+
         self.action = action
         self.reward = np.zeros((self.agent_num,), dtype=np.float32)
         done = False # done is always False in this environment
@@ -80,8 +82,6 @@ class Goldmine(Env):
         for i, y, x in task_finished:
             ny, nx = self._spawn_task()
             self.task_update.append([self.step_cnt, i, y, x, ny, nx])
-
-        self.step_cnt += 1
 
         return np.array(self._get_observation()), np.array(self.reward), done, {}
 
