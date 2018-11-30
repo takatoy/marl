@@ -27,7 +27,7 @@ params = {
     'steps'             : 200,
     'no_op_episodes'    : 100,
     'epsilon'           : EpsilonExponentialDecay(init=1.0, rate=0.9998),
-    'train_every'       : 8,
+    'train_every'       : 1,
     'save_model_every'  : 1000,
     'is_centralized'    : True,
 
@@ -45,7 +45,7 @@ params = {
             agent_num         = agent_num,
             memory_size       = 40000,
             batch_size        = 256,
-            learning_rate     = 0.00025,
+            learning_rate     = 0.0002,
             gamma             = 0.99,
             target_update     = 200
         ),
