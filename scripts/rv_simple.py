@@ -44,7 +44,7 @@ params = {
         ) for _ in range(agent_num)
     ],
 
-    'hyperdash', exp
+    'hyperdash': exp
 }
 
 trainer = Trainer(**params)
