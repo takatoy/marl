@@ -15,6 +15,7 @@ seaborn = "*"
 matplotlib = "*"
 pandas = "*"
 jupyterlab = "*"
+nbstripout = "*"
 
 [dev-packages]
 
