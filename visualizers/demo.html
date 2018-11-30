@@ -1,0 +1,114 @@
+<center>
+    <div>
+        <canvas id="canvas" height="400px" width="400px" style="border: 1px solid;"></canvas>
+    </div>
+    <div>
+        Step: <span id="step"></span>
+    </div>
+    <br>
+    <div>
+        <button id="play">Play</button>
+        <button id="pause">Pause</button>
+        <button id="reset">Reset</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <button id="prev">Prev</button>
+        <button id="next">Next</button>
+    </div>
+</center>
+<script>
+var HEIGHT = 400
+var WIDTH  = 400
+var GRID_HEIGHT = 20
+var GRID_WIDTH  = 20
+var CELL_HEIGHT = HEIGHT / GRID_HEIGHT
+var CELL_WIDTH  = WIDTH  / GRID_WIDTH
+
+function callback(res) {
+    var canvas   = document.getElementById("canvas");
+    var elPrev   = document.getElementById("prev");
+    var elPlay   = document.getElementById("play");
+    var elPause  = document.getElementById("pause");
+    var elReset  = document.getElementById("reset");
+    var elNext   = document.getElementById("next");
+    var elStep   = document.getElementById("step");
+    var ctx = canvas.getContext("2d");
+
+    var data = JSON.parse(res.content.text.trim());
+
+    var step = 0;
+    
+    function setStep(n) {
+        step = n;
+        elStep.innerHTML = step;
+    }
+
+    function drawAgent(x, y) {
+        ctx.fillStyle = 'rgb(247, 74, 140)';
+        ctx.fillRect(CELL_WIDTH * x, CELL_HEIGHT * y, CELL_WIDTH, CELL_HEIGHT);
+    }
+
+    function drawTask(x, y) {
+        ctx.fillStyle = 'rgb(68, 133, 237)';
+        ctx.fillRect(CELL_WIDTH * x, CELL_HEIGHT * y, CELL_WIDTH, CELL_HEIGHT);
+    }
+
+    function clearRect(x, y) {
+        ctx.clearRect(CELL_WIDTH * x, CELL_HEIGHT * y, CELL_WIDTH, CELL_HEIGHT);
+    }
+    
+    var player = null;
+    
+    function pause() {
+        if (player == null) return;
+        clearInterval(player);
+        player = null;
+    }
+
+    function next() {
+        if (step >= data.length) {
+            pause();
+            return;
+        }
+        var d = data[step];
+        for (coord of d.ra) clearRect(coord[0], coord[1]);
+        for (coord of d.rt) clearRect(coord[0], coord[1]);
+        for (coord of d.aa) drawAgent(coord[0], coord[1]);
+        for (coord of d.at) drawTask(coord[0], coord[1]);
+        setStep(step + 1);
+    }
+    
+    function play() {
+        if (player != null) return;
+        next();
+        player = setInterval(next, 300);
+    }
+
+    function prev() {
+        if (step <= 1) return;
+        setStep(step - 1);
+        var d = data[step];
+        for (coord of d.aa) clearRect(coord[0], coord[1]);
+        for (coord of d.at) clearRect(coord[0], coord[1]);
+        for (coord of d.ra) drawAgent(coord[0], coord[1]);
+        for (coord of d.rt) drawTask(coord[0], coord[1]);
+    }
+    
+    function reset() {
+        pause();
+        ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        setStep(0);
+        next();
+    }
+
+    elPlay.addEventListener("click", play);
+    elPause.addEventListener("click", pause);
+    elNext.addEventListener("click", next);
+    elPrev.addEventListener("click", prev);
+    elReset.addEventListener("click", reset);
+    
+    reset();
+}
+
+var kernel = IPython.notebook.kernel;
+kernel.execute('getDataJson()', {'iopub': {'output': callback}});
+</script>

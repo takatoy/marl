@@ -14,6 +14,9 @@ hd-train:
 train:
 	PYTHONPATH=./lib pipenv run python '$(s)'
 
+lab:
+	pipenv run jupyter lab
+
 clean:
 	rm -rf outputs
 	rm -rf `pipenv --venv`
