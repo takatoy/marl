@@ -136,10 +136,12 @@ class Trainer:
             print('--- train ---')
             epsilon = self.epsilon.get(e)
             print('epsilon: {:.4f}'.format(epsilon))
-            record_path = self.train_record_path + '/episode{:05d}'.format(e + 1) \
+
+            path = self.train_record_path + '/episode{:05d}'.format(e + 1) \
                 if (e + 1) % self.record_every == 0 else ""
             total_reward, ave_loss = self._episode(epsilon=epsilon,
-                do_train=True, do_memorize=True, record_path=record_path)
+                do_train=True, do_memorize=True, record_path=path)
+
             print('total reward: {:.2f}, average loss: {:.4f}'.format(total_reward, ave_loss))
             self.train_logger.log(e, total_reward, ave_loss)
             if self.hyperdash is not None:
@@ -147,10 +149,12 @@ class Trainer:
 
             ### Evaluation ###
             print('--- eval ---')
-            record_path = self.eval_record_path + '/episode{:05d}'.format(e + 1) \
+
+            path = self.eval_record_path + '/episode{:05d}'.format(e + 1) \
                 if (e + 1) % self.record_every == 0 else ""
             total_reward, _ = self._episode(epsilon=0.0,
-                do_train=False, do_memorize=False, record_path=record_path)
+                do_train=False, do_memorize=False, record_path=path)
+
             print('total reward: {:.2f}'.format(total_reward))
             self.eval_logger.log(e, total_reward, 0.0)
             if self.hyperdash is not None:
