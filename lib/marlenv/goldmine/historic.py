@@ -1,9 +1,9 @@
 import numpy as np
 from marlenv.goldmine.relative import GoldmineRV
 
-class GoldmineMV(GoldmineRV):
+class GoldmineHRV(GoldmineRV):
     """
-    MV stands for memorized view
+    HRV stands for historic relative view
     """
     def __init__(self, agent_num, task_num, view_range, mem_period):
         self.mem_period = mem_period

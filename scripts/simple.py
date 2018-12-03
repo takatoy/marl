@@ -5,7 +5,7 @@ from marlenv.goldmine.basic import Goldmine
 from marlenv.util import GoldmineRecorder
 from agent.deepq.simple_dqn import SimpleDQN
 
-name = 'simple'
+name = 'gv_n4'
 exp = Experiment(name)
 
 agent_num = 6
@@ -15,11 +15,11 @@ env.seed(0)
 
 params = {
     'name'              : name,
-    'episodes'          : 40000,
+    'episodes'          : 30000,
     'steps'             : 200,
     'no_op_episodes'    : 100,
     'epsilon'           : EpsilonExponentialDecay(init=1.0, rate=0.9998),
-    'train_every'       : 1,
+    'train_every'       : 8,
     'save_model_every'  : 1000,
     'is_centralized'    : False,
 
@@ -34,11 +34,11 @@ params = {
         SimpleDQN(
             action_space      = env.action_space,
             observation_space = env.observation_space,
-            memory_size       = 10000,
-            batch_size        = 32,
-            learning_rate     = 0.0002,
+            memory_size       = 40000,
+            batch_size        = 256,
+            learning_rate     = 0.00025,
             gamma             = 0.99,
-            target_update     = 200,
+            target_update     = 100,
             use_dueling       = False
         ) for _ in range(agent_num)
     ],
