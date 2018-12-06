@@ -64,8 +64,9 @@ class Trainer:
         self.hyperdash         = hyperdash
 
     def _episode(self, epsilon, do_train=False, do_memorize=False, record_path=""):
-        obs_queue = np.zeros((self.agent_num, self.obs_num,) + self.observation_space)
+        obs_queue = np.zeros((self.agent_num, self.obs_num,) + self.env.observation_space)
         obs = self.env.reset()
+
         if self.obs_num > 1:
             obs_queue[:, 0] = obs
             obs = np.array(obs_queue)
