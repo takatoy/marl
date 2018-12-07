@@ -32,7 +32,7 @@ class SimpleDQN(Agent):
 
         # variables
         self.train_cnt = 0
-        self.memory = Memory(memory_size)
+        self.memory = Memory(memory_size, observation_space)
 
         self.target_network = self._get_model()
         self.eval_network   = self._get_model()

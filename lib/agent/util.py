@@ -2,27 +2,30 @@ from collections import deque
 import numpy as np
 
 class Memory:
-    def __init__(self, memory_size):
-        self.buffer = deque(maxlen=memory_size)
+    def __init__(self, memory_size, observation_space):
+        self.head = 0
+        self.is_full = False
+        self.memory_size = memory_size
+        self.obs_buf  = np.empty((memory_size,) + observation_space)
+        self.act_buf  = np.empty((memory_size,), dtype=np.int16)
+        self.rwd_buf  = np.empty((memory_size,), dtype=np.float32)
+        self.nobs_buf = np.empty((memory_size,) + observation_space)
 
-    def __len__(self):
-        return len(self.buffer)
-
-    def add(self, obs, action, reward, nobs):
-        self.buffer.append([obs, action, reward, nobs])
-
-    def get(self, i):
-        return np.array(self.buffer[i][0]), \
-               np.array(self.buffer[i][1]), \
-               np.array(self.buffer[i][2]), \
-               np.array(self.buffer[i][3])
+    def add(self, obs, act, rwd, nobs):
+        self.obs_buf[self.head]  = obs
+        self.act_buf[self.head]  = act
+        self.rwd_buf[self.head]  = rwd
+        self.nobs_buf[self.head] = nobs
+        self.head = (self.head + 1) % self.memory_size
+        if self.head == 0: self.is_full = True
 
     def sample(self, batch_size):
-        idx = np.random.choice(np.arange(len(self.buffer)), size=batch_size, replace=False)
-        return np.array([self.buffer[i][0] for i in idx]), \
-               np.array([self.buffer[i][1] for i in idx]), \
-               np.array([self.buffer[i][2] for i in idx]), \
-               np.array([self.buffer[i][3] for i in idx])
+        length = self.memory_size if self.is_full else self.head + 1
+        idx = np.random.choice(np.arange(length), size=batch_size, replace=False)
+        return np.array(self.obs_buf[idx]), \
+               np.array(self.act_buf[idx]), \
+               np.array(self.rwd_buf[idx]), \
+               np.array(self.nobs_buf[idx])
 
 class EpsilonExponentialDecay:
     def __init__(self, init, rate):
