@@ -36,10 +36,10 @@ params = {
         SimpleDQN(
             action_space      = env.action_space,
             observation_space = env.observation_space,
-            memory_size       = 40000,
+            memory_size       = 100000,
             batch_size        = 256,
-            learning_rate     = 0.00025,
-            gamma             = 0.99,
+            learning_rate     = 0.0002,
+            gamma             = 0.92,
             target_update     = 100,
             use_dueling       = False
         ) for _ in range(agent_num)

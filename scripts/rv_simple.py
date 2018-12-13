@@ -20,7 +20,7 @@ params = {
     'steps'             : 200,
     'no_op_episodes'    : 100,
     'epsilon'           : EpsilonExponentialDecay(init=1.0, rate=0.9998),
-    'train_every'       : 4,
+    'train_every'       : 8,
     'save_model_every'  : 1000,
     'is_centralized'    : False,
 
@@ -36,7 +36,7 @@ params = {
             action_space      = env.action_space,
             observation_space = env.observation_space,
             memory_size       = 100000,
-            batch_size        = 128,
+            batch_size        = 256,
             learning_rate     = 0.0002,
             gamma             = 0.92,
             target_update     = 100,
