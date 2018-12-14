@@ -3,8 +3,7 @@ from marlenv.env import Env
 
 class Goldmine(Env):
     """
-    Goldmine Environment
-
+    Goldmine Environment.
     Actions: 0: Move Up, 1: Move Right, 2: Move Down, 3: Move Left
     """
     def __init__(self, agent_num, task_num):

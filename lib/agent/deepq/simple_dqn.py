@@ -89,6 +89,7 @@ class SimpleDQN(Agent):
         return loss
 
     def _calc_target(self, batch_obs, batch_action, batch_reward, batch_nobs):
+        # TODO: Handle terminal
         n = len(batch_action)
 
         target_q_vals = self.target_network.predict(batch_nobs, batch_size=self.batch_size)

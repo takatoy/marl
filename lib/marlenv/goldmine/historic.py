@@ -3,7 +3,8 @@ from marlenv.goldmine.relative import GoldmineRV
 
 class GoldmineHRV(GoldmineRV):
     """
-    HRV stands for historic relative view
+    HRV stands for historic relative view.
+    Tasks remain in the observation for h steps, even after out of view range.
     """
     def __init__(self, agent_num, task_num, view_range, mem_period):
         self.mem_period = mem_period

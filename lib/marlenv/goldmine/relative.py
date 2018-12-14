@@ -3,7 +3,9 @@ from marlenv.goldmine.basic import Goldmine
 
 class GoldmineRV(Goldmine):
     """
-    RV stands for relative view
+    RV stands for relative view.
+    Only give observation that contains tasks in view range.
+    Observation space is same as the global view.
     """
     def __init__(self, agent_num, task_num, view_range):
         self.view_range = view_range
