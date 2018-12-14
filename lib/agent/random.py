@@ -5,8 +5,9 @@ from agent.util import Memory
 
 class RandomAgent(Agent):
     def __init__(self, action_space, observation_space, memory_size):
+        super().__init__(action_space, observation_space, memory_size)
         self.action_space = action_space
-        self.memory = Memory(memory_size)
+        self.memory = Memory(memory_size, observation_space)
 
     def get_action(self, obs):
         return np.random.randint(self.action_space, dtype=np.int16)

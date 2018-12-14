@@ -38,10 +38,8 @@ class Env:
         """
         Run for cleaning up environment.
         """
-        pass
 
     def seed(self, seed=None):
         """
         Set random seed.
         """
-        pass

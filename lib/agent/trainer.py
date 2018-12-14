@@ -100,13 +100,15 @@ class Trainer:
                 nobs = self.preprocess(nobs)
 
             if self.is_centralized:
-                if do_memorize: self.agent.memory.add(obs, action, reward, nobs)
+                if do_memorize:
+                    self.agent.memory.add(obs, action, reward, nobs)
                 if do_train and (s + 1) % self.train_every == 0:
                     total_loss += self.agent.train()
                     train_cnt += 1
             else:
                 for i, ag in enumerate(self.agent):
-                    if do_memorize: ag.memory.add(obs[i], action[i], reward[i], nobs[i])
+                    if do_memorize:
+                        ag.memory.add(obs[i], action[i], reward[i], nobs[i])
                     if do_train and (s + 1) % self.train_every == 0:
                         total_loss += ag.train()
                         train_cnt += 1

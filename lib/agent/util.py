@@ -1,4 +1,3 @@
-from collections import deque
 import numpy as np
 
 class Memory:
@@ -17,7 +16,8 @@ class Memory:
         self.rwd_buf[self.head]  = rwd
         self.nobs_buf[self.head] = nobs
         self.head = (self.head + 1) % self.memory_size
-        if self.head == 0: self.is_full = True
+        if self.head == 0:
+            self.is_full = True
 
     def sample(self, batch_size):
         length = self.memory_size if self.is_full else self.head + 1

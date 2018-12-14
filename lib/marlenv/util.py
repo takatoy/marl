@@ -1,5 +1,4 @@
 import os
-import numpy as np
 
 class Recorder:
     def __init__(self):
@@ -11,7 +10,7 @@ class Recorder:
     def record(self, data):
         raise NotImplementedError
 
-    def end_epidose(self):
+    def end_episode(self):
         raise NotImplementedError
 
 class GoldmineRecorder(Recorder):
