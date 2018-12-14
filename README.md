@@ -15,5 +15,5 @@ make hd-login
 ## Train
 
 ```sh
-make hd-train s=<script name> n=<experiment name> g=<gpu number>
+make hd-train s=<script name> g=<gpu number>
 ```
