@@ -3,7 +3,7 @@ init:
 	pipenv --bare install
 
 lint:
-	pipenv run pylint --rcfile ./pylintrc ./**/*.py
+	pipenv run pylint --rcfile ./pylintrc `find lib scripts -name *.py`
 
 hd-login:
 	pipenv run hd login --email
