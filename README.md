@@ -1,4 +1,4 @@
-# Mutli-agent Reinforcement Learning
+# Mutli-agent RL
 
 ## Install
 
